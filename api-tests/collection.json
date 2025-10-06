@@ -1,0 +1,232 @@
+{
+  "info": {
+    "_postman_id": "dea538f6-3f3e-4306-b20f-fdbb47b0dce2",
+    "name": "collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "47100747",
+    "_collection_link": "https://tgc-dilruba-jesey-8492486.postman.co/workspace/Dilruba-Khanam-Jesey's-Workspac~d655e233-e4c8-4471-8ae6-24e8b39ce221/collection/47100747-dea538f6-3f3e-4306-b20f-fdbb47b0dce2?action=share&source=collection_link&creator=47100747"
+  },
+  "item": [
+    {
+      "name": "Create Booking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"id\", jsonData.bookingid);",
+              "",
+              "var code = responseCode.code;",
+              "var idValue = pm.environment.get(\"id\");",
+              "",
+              "switch (code) {",
+              "    case 200:",
+              "        pm.test(\"Status code matched 200\", function () {});",
+              "",
+              "        pm.test(\"Last Name Check\", function () {",
+              "            const actual = jsonData.booking.lastname?.trim().toLowerCase();",
+              "            const expected = pm.environment.get(\"lastName\")?.trim().toLowerCase();",
+              "            console.log(\"Last Name:\", actual, \"| Expected:\", expected);",
+              "            pm.expect(actual).to.eql(expected);",
+              "        });",
+              "",
+              "        pm.test(\"First Name Check\", function () {",
+              "            const actual = jsonData.booking.firstname?.trim().toLowerCase();",
+              "            const expected = pm.environment.get(\"firstName\")?.trim().toLowerCase();",
+              "            console.log(\"First Name:\", actual, \"| Expected:\", expected);",
+              "            pm.expect(actual).to.eql(expected);",
+              "        });",
+              "",
+              "        pm.test(\"Date Check\", function () {",
+              "            const actual = jsonData.booking.bookingdates.checkin;",
+              "            const expected = pm.environment.get(\"checkin\");",
+              "            console.log(\"Checkin Date:\", actual, \"| Expected:\", expected);",
+              "            pm.expect(actual).to.eql(expected);",
+              "        });",
+              "",
+              "        pm.test(\"AdditionalNeeds Check\", function () {",
+              "            const actual = jsonData.booking.additionalneeds?.trim().toLowerCase();",
+              "            const expected = pm.environment.get(\"additionalneeds\")?.trim().toLowerCase();",
+              "            console.log(\"Additional Needs:\", actual, \"| Expected:\", expected);",
+              "            pm.expect(actual).to.eql(expected);",
+              "        });",
+              "",
+              "        break;",
+              "",
+              "    default:",
+              "        pm.test(\"Status code not valid or unknown\", function () {});",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const moment = require('moment');",
+              "",
+              "// Generate dynamic check-in and check-out dates",
+              "const today = moment();",
+              "pm.environment.set('checkin', today.add(2, 'day').format(\"YYYY-MM-DD\"));",
+              "pm.environment.set('checkout', today.add(2, 'day').add(2, 'day').format(\"YYYY-MM-DD\")); // check-out is 2 days after check-in",
+              "",
+              "// Set random last name using Postman's built-in variable",
+              "let userName = pm.variables.replaceIn(\"{{$randomUserName}}\");",
+              "pm.environment.set(\"lastName\", userName);",
+              "",
+              "// ✅ Set random first name using Postman's correct variable",
+              "let firstName = pm.variables.replaceIn(\"{{$randomFirstName}}\");",
+              "pm.environment.set(\"firstName\", firstName);",
+              "",
+              "// Set additional needs using random noun",
+              "let randomNoun = pm.variables.replaceIn(\"{{$randomNoun}}\");",
+              "pm.environment.set(\"additionalneeds\", randomNoun);"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\t\"firstname\" : \"{{firstName}}\",\r\n\t\"lastname\" : \"{{lastName}}\",\r\n\t\"totalprice\" : 111,\r\n\t\"depositpaid\" : true,\r\n\t\"bookingdates\" : {\r\n    \t\"checkin\" : \"{{checkin}}\",\r\n    \t\"checkout\" : \"{{checkout}}\"\r\n\t},\r\n\t\"additionalneeds\" : \"{{additionalneeds}}\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/booking/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "booking",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Booking",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/booking/{{id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "booking",
+            "{{id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Booking",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "token=7013f54e79ea0f2",
+            "type": "default"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\t\"firstname\" : \"Anika\",\r\n\t\"lastname\" : \"Tabassum\",\r\n\t\"totalprice\" : 200,\r\n\t\"depositpaid\" : true,\r\n\t\"bookingdates\" : {\r\n    \t\"checkin\" : \"2018-01-01\",\r\n    \t\"checkout\" : \"2019-01-01\"\r\n\t},\r\n\t\"additionalneeds\" : \"Breakfast\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/booking/{{id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "booking",
+            "{{id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json()",
+              "pm.environment.set(\"accessToken\",jsonData.token)"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\t\"username\": \"admin\",\r\n\t\"password\": \"password123\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Booking",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "token=7013f54e79ea0f2",
+            "type": "default"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/booking/{{id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "booking",
+            "{{id}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

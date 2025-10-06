@@ -1,0 +1,46 @@
+name: API Tests with Newman
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-api-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Step 1: Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Step 2: Install Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    # Step 3: Install Newman + HTML Extra Reporter
+    - name: Install Newman and HTML Extra Reporter
+      run: |
+        npm install -g newman
+        npm install -g newman-reporter-htmlextra
+
+    # Step 4: Run Newman tests and generate HTML report inside "newman" folder
+    - name: Run Newman tests
+      run: |
+        mkdir -p newman
+        newman run ./api-tests/collection.json \
+          -e ./api-tests/environment.json \
+          -r cli,htmlextra \
+          --reporter-htmlextra-export ./newman/newman-report.html
+
+    # Step 5: Upload HTML report as GitHub Actions artifact
+    - name: Upload Newman HTML Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: newman-html-report
+        path: newman/newman-report.html
+
